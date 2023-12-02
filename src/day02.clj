@@ -16,28 +16,25 @@
                         (str/split s #",\s*"))))
           (apply merge-with max))]))
 
+(defn games [input]
+  (mapv parse-game (str/split-lines input)))
 
 (comment
 
-  (let [games (->> input #_small-input
-                   str/split-lines
-                   (mapv parse-game))
-        required {:red 12, :green 13, :blue 14}
+  (let [required {:red 12, :green 13, :blue 14}
         possible? (fn [cubes]
                     (->> cubes
                          (map (juxt val (comp required key)))
                          (every? (partial apply <=))))]
-    (->> games
-         (filter (comp possible? second))
-         (map first)
-         (reduce +)))
+    (->> (games input #_small-input)
+         (transduce (comp (filter (comp possible? second))
+                          (map first))
+                    +)))
   ;; 2348
 
-  (let [games (->> input #_small-input
-                   str/split-lines
-                   (mapv parse-game))]
-    (->> (map (comp (partial apply *) vals second) games)
-         (reduce +)))
+  (->> (games input #_small-input)
+       (transduce (map (comp (partial apply *) vals second))
+                  +))
   ;; 76008
 
   )
